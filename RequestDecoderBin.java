@@ -14,7 +14,6 @@ public class RequestDecoderBin implements RequestDecoder, RequestBinConst {
   }
 
   public Request decode(InputStream wire) throws IOException {
-      boolean single, rich, female;
     DataInputStream src = new DataInputStream(wire);
     short num = src.readShort();
 
