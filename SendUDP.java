@@ -46,13 +46,17 @@ public class SendUDP {
             long startTime = System.currentTimeMillis();
 
             // Receive the response from the server (decode it)
-            byte[] receiveData = new byte[1024]; // max bytes for the response string (way more than necessary)
+            byte[] receiveData = new byte[12]; // max bytes for the response string
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             sock.receive(receivePacket);
 
+            int dataLength = receivePacket.getLength();
+            byte[] validData = new byte[dataLength];
+            System.arraycopy(receivePacket.getData(), 0, validData, 0, dataLength); // Copy valid data to array
+
             // Display the received bytes in hexadecimal format
             System.out.print("Received bytes in hexadecimal: ");
-            for (byte b : receivePacket.getData()) {
+            for (byte b : validData) {
                 System.out.printf("%02X ", b);
             }
             System.out.println(); // Print a newline to separate the output

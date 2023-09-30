@@ -13,7 +13,7 @@ public class RecvUDP {
         DatagramSocket sock = new DatagramSocket(port); // UDP socket for receiving
 
         while (true) { // Server continuously listens for incoming requests
-            DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
+            DatagramPacket packet = new DatagramPacket(new byte[2], 2);
             sock.receive(packet);
 
             // Display received bytes in hexadecimal format
@@ -24,11 +24,11 @@ public class RecvUDP {
             }
             System.out.println();
 
-            // Extract the received number (N) from the received bytes
-            short receivedNumber = (short) ((receivedBytes[1] << 8) | (receivedBytes[0] & 0xFF));
+            // Extract the received number from the received bytes
+            short receivedNumber = (short) ((receivedBytes[0] << 8) | (receivedBytes[1] & 0xFF));
 
-            // Display the received number (N) for a normal user
-            System.out.println("Received number N: " + receivedNumber);
+            // Display the received number
+            System.out.println("Received number: " + receivedNumber);
 
             // Display the IP address and port of the client
             InetAddress clientAddress = packet.getAddress();
@@ -56,7 +56,7 @@ public class RecvUDP {
                 System.out.printf("%02X ", b);
             }
             System.out.println();
-            
+
             // Create a response packet with the encoded data
             DatagramPacket responsePacket = new DatagramPacket(encodedResponse, encodedResponse.length,
                     clientAddress, clientPort);
