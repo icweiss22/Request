@@ -1,5 +1,5 @@
-import java.net.*;  // for DatagramSocket and DatagramPacket
-import java.io.*;   // for IOException
+import java.net.*;
+import java.io.*;
 
 public class RecvUDP {
 
@@ -16,25 +16,50 @@ public class RecvUDP {
             DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
             sock.receive(packet);
 
-            RequestDecoder decoder = (args.length == 2 ? // Which encoding
-                    new RequestDecoderBin(args[1]) :
-                    new RequestDecoderBin());
+            // Display received bytes in hexadecimal format
+            System.out.print("Received bytes in hexadecimal: ");
+            byte[] receivedBytes = packet.getData();
+            for (byte b : receivedBytes) {
+                System.out.printf("%02X ", b);
+            }
+            System.out.println();
 
-            Request receivedRequest = decoder.decode(packet);
+            // Extract the received number (N) from the received bytes
+            short receivedNumber = (short) ((receivedBytes[1] << 8) | (receivedBytes[0] & 0xFF));
 
-            System.out.println("Received Binary-Encoded Request");
-            System.out.println(receivedRequest);
+            // Display the received number (N) for a normal user
+            System.out.println("Received number N: " + receivedNumber);
+
+            // Display the IP address and port of the client
+            InetAddress clientAddress = packet.getAddress();
+            int clientPort = packet.getPort();
+            System.out.println("Client IP Address: " + clientAddress.getHostAddress());
+            System.out.println("Client Port: " + clientPort);
 
             // Process the received request and generate a response
-            short receivedNumber = receivedRequest.getNum();
-            String responseString = String.valueOf(receivedNumber); // Convert the number to a string
+            String responseString;
+
+            if (packet.getLength() != 2) {
+                // If received bytes are not equal to 2, return the string "****"
+                responseString = "****";
+            } else {
+                // Convert the received number to a string
+                responseString = String.valueOf(receivedNumber);
+            }
 
             // Encode the response as UTF-16
-            byte[] encodedResponse = responseString.getBytes("UTF-16BE");
+            byte[] encodedResponse = responseString.getBytes("UTF-16");
 
+            // Display bytes of the encoded response string in hexadecimal format
+            System.out.print("Response bytes in hexadecimal: ");
+            for (byte b : encodedResponse) {
+                System.out.printf("%02X ", b);
+            }
+            System.out.println();
+            
             // Create a response packet with the encoded data
             DatagramPacket responsePacket = new DatagramPacket(encodedResponse, encodedResponse.length,
-                    packet.getAddress(), packet.getPort());
+                    clientAddress, clientPort);
 
             // Send the response back to the client
             sock.send(responsePacket);
@@ -43,4 +68,3 @@ public class RecvUDP {
         }
     }
 }
-
