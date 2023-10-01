@@ -27,7 +27,19 @@ public class SendUDP {
         for (int i = 0; i < 5; i++) { // Repeat 5 times for 5 different numbers
             // Prompt the user to enter a number 'num' (using a Scanner)
             System.out.print("Enter a number (-32768 to 32767): ");
-            short num = scanner.nextShort();
+            short num = 0;
+
+            boolean validInput = false; // don't continue unless valid input entered
+            while (!validInput) {
+                System.out.print("Enter a number (-32768 to 32767): ");
+
+                if (scanner.hasNextShort()) {
+                    num = scanner.nextShort();
+                    validInput = true;
+                } else {
+                    System.out.println("Invalid input: " + scanner.next() + " is not a valid input. Please enter a number (-32768 to 32767).");
+                }
+            }
 
             // Display bytes of num in hexadecimal format
             byte[] numBytes = new byte[]{(byte) (num >> 8), (byte) num};
